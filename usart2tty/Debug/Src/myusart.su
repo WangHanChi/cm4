@@ -1,0 +1,5 @@
+../Src/myusart.c:12:6:MYUSART_Init	4	static
+../Src/myusart.c:35:6:MYUSART_SendData	24	static
+../Src/myusart.c:47:9:MYUSART_ReceiveData	16	static
+../Src/myusart.c:59:5:_write	24	static
+../Src/myusart.c:66:5:_read	32	static
