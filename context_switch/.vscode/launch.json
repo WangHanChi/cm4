@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": 
+    [
+        {
+            "name": "Debug (OpenOCD)",
+            "cwd": "${workspaceRoot}",
+            "executable": "build/main",
+            "request": "launch",
+            "type": "cortex-debug",
+            "targetId": "STM32F429ZI",
+            "svdFile": "stm32f429.svd",
+            "servertype": "openocd",
+            "armToolchainPath": "/usr/bin/",
+            "configFiles": [
+                "board/st_nucleo_f4.cfg",
+            ],
+        }
+    ]
+}
