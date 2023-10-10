@@ -1,5 +1,4 @@
-#ifndef __REG_H_
-#define __REG_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -67,5 +66,3 @@
 #define PWR		        ((__REG_TYPE) 0x40007000)
 #define PWR_CR	        ((__REG) (PWR + 0x00))
 #define PWR_CSR	        ((__REG) (PWR + 0x04))
-
-#endif

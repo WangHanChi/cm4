@@ -14,9 +14,9 @@ void shell_start()
     while (1) {
         // new line head
         if (IsRoot)
-            print_str("root@stm32f4~# ");
+            print_str("root@cm4~# ");
         else
-            print_str("hank@stm32f4~$ ");
+            print_str("hank@cm4~$ ");
 
         scan_str(input);
         parse(input);
