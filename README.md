@@ -51,7 +51,7 @@ $ make upload
 ```
 - Connect with screen
 ```
-$ make connect
+$ make screen
 ```
 - Help
 ```

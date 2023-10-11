@@ -25,7 +25,7 @@ src/startup.c
 C_INCLUDES = -Iinc
 
 # linker script files
-LDSCRIPT = os.ld
+LDSCRIPT = src/os.ld
 
 VPATH = $(dir $(C_SOURCES))
 
@@ -55,7 +55,7 @@ help:
 	@echo "| debug       | use openocd to enter debug mode             |"
 	@echo "| clean       | remove the intermediate objects and image   |"
 	@echo "| format      | use clang format to make code tidy          |"
-	@echo "| connect     | use screen to communicate with the board    |"
+	@echo "| screen      | use screen to communicate with the board    |"
 	@echo "+-----------------------------------------------------------+"
 	@echo ""
 
@@ -80,12 +80,12 @@ $(OUT):
 	mkdir $@
 
 upload: os
-	openocd -f interface/stlink.cfg -f board/st_nucleo_f4.cfg -c " program $(OUT)/$(TARGET) exit "
+	openocd -f interface/stlink.cfg -f board/st_nucleo_f4.cfg -c " program $(OUT)/$(TARGET) exit reset"
 
 debug:
 	openocd -f board/st_nucleo_f4.cfg
 
-connect:
+screen:
 	gnome-terminal -- bash -c "screen /dev/ttyACM0 115200"
 
 format:
