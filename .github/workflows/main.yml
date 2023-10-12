@@ -10,3 +10,4 @@ jobs:
             sudo apt-get update
             sudo apt-get install gcc-arm-none-eabi
             make os
+            make loader
