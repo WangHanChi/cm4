@@ -14,6 +14,12 @@
  */
 #define USART_FLAG_RXNE ((uint16_t) 0x0020)
 
+#define DELAY(x)                            \
+    do {                                    \
+        for(int i = 0 ; i < 5000*x; i++)    \
+            ;                               \
+    } while(0)
+
 extern uint32_t DEFAULT_F_CLK;
 extern uint32_t BAUDRATE;
 

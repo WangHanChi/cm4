@@ -16,7 +16,7 @@ void shell_start()
         if (IsRoot)
             print_str("root@cm4~# ");
         else
-            print_str("hank@cm4~$ ");
+            print_str("\e[32;01mhank@cm4\e[0m:\e[34;01m~$\e[0m ");
 
         scan_str(input);
         parse(input);
