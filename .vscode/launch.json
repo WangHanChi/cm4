@@ -9,7 +9,7 @@
             "request": "launch",
             "type": "cortex-debug",
             "targetId": "STM32F429ZI",
-            "svdFile": "/home/hanchi/mini-os/10-Priority/stm32f429.svd",
+            "svdFile": "/home/hanchi/cm4/stm32f429.svd",
             "servertype": "openocd",
             "armToolchainPath": "/usr/bin/",
             "configFiles": [

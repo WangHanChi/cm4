@@ -11,6 +11,9 @@ static inline void __set_MSP(uint32_t topOfMainStack)
   asm volatile ("MSR msp, %0\n" : : "r" (topOfMainStack));
 }
 
+void loading_frame();
+int check(uint32_t *address);
+
 void go2APP(void)
 {
     uint32_t JumpAddress;
@@ -18,7 +21,8 @@ void go2APP(void)
     print_str("BOOTLOADER Start \n\r");
 
     /* check if there is something "installed" in the app FLASH region */
-    if(((*(uint32_t*)FLASH_APP_ADDR) & 0x2FFE0000) != 0x20000000){
+    if(check((uint32_t *)FLASH_APP_ADDR)){
+        loading_frame();
         print_str("\33[2J\n");
         DELAY(500);
         /* Jump to the application */
@@ -63,14 +67,29 @@ int main(void)
         while((start[0] == 0)){
             scan_str(start);    
         }
-        print_str("\n\rWelcome : )\nProgress Bar [\e[36;01m");
-        for(int i = 0 ; i < 60; ++i){
-            print_char('#');
-            DELAY(10);
-        }
-        print_str("\e[0m]\n");
-        DELAY(200);
+        
         go2APP();
+        DELAY(10000);
     }
 	return 0;
+}
+
+void loading_frame()
+{
+    print_str("\n\rWelcome : )\nProgress Bar [\e[36;01m");
+    for(int i = 0 ; i < 60; ++i){
+        print_char('#');
+        DELAY(10);
+    }
+    print_str("\e[0m]\n");
+    DELAY(120);
+}
+
+int check(uint32_t *address)
+{
+    for(int i = 0 ; i < 256; ++i){
+        if(*(address + i*4) & 0xFFFFFFFF)
+            return 1;
+    }
+    return 0;
 }
