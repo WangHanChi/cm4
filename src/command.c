@@ -99,3 +99,8 @@ void command_exit()
     } else
         print_str("You are already not root\n");
 }
+
+void command_clear()
+{
+    print_str("\33[2J\n");
+}

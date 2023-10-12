@@ -22,7 +22,7 @@ void print_str(const char *str)
 }
 
 /* scan the stdin for user keyin */
-void scan_str(char *str)
+int scan_str(char *str)
 {
     char received_char;
     int index = 0;
@@ -40,8 +40,6 @@ void scan_str(char *str)
         /* Read the received character from USART3_DR */
         received_char = *USART3_DR & 0xFF;
 
-        print_char(received_char);
-
         /* Clear RXNE by set 0 */
         *USART3_SR &= ~(USART_FLAG_RXNE);
 
@@ -52,14 +50,20 @@ void scan_str(char *str)
             print_char('\n');
             print_char('\r');
             break;
-        }
-
+        } else if (received_char == 127) {
+            print_str("\33[1D");
+            print_str("\33[K");
+            index--;
+            continue;
+        } else
+            print_char(received_char);
         /* Store the received character in the buffer */
         str[index] = received_char;
 
         /* Increment the index for the next character */
         index++;
     }
+    return index;
 }
 
 void usart_init(void)

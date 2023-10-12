@@ -18,7 +18,8 @@ void shell_start()
         else
             print_str("\e[32;01mhank@cm4\e[0m:\e[34;01m~$\e[0m ");
 
-        scan_str(input);
+        int num = scan_str(input);
+        strtrim(input, num);
         parse(input);
     }
 }
@@ -37,6 +38,8 @@ void parse(char str[])
         command_lscpu();
     else if (!strcmp(str, "exit"))
         command_exit();
+    else if (!strcmp(str, "clear"))
+        command_clear();
     else
         command_not_found(str);
 }

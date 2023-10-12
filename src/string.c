@@ -124,3 +124,8 @@ void reverse(char *str)
         str[0] = temp;
     }
 }
+
+void strtrim(char str[], int len)
+{
+    str[len] = '\0';
+}

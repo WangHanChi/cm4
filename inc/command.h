@@ -9,3 +9,4 @@ void command_reboot();
 void command_sudo_su();
 void command_lscpu();
 void command_exit();
+void command_clear();

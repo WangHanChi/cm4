@@ -9,3 +9,4 @@ char *strncpy(char *dest, const char *src, int len);
 void itoa(int x, char str[], int d);
 void ftoa(float n, char* res, int afterpoint);
 void reverse(char *str);
+void strtrim(char str[], int len);
