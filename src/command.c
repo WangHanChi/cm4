@@ -57,6 +57,7 @@ void command_reboot()
 {
     if (IsRoot) {
         print_str("Rebooting ...\n\n\n\n");
+        DELAY(30);
         (*SCB_AIRCR) = 0x05FA0004;
     } else {
         print_str("Error: Permission denied\n");

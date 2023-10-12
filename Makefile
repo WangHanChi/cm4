@@ -11,6 +11,7 @@ include mk/common.mk
 
 TARGET = os
 OUT = build
+BOOTLOADER = bootloader/build/loader
 
 # C source files
 C_SOURCE = 			\
@@ -50,8 +51,9 @@ help:
 	@echo "|   command   |                description                  |"
 	@echo "|-------------+---------------------------------------------|"
 	@echo "| help        | show command manual                         |"
-	@echo "| os          | compile, link and assemble the source files |"
-	@echo "| upload      | do 'bin' and upload the image to the board  |"
+	@echo "| os          | compile, link and assemble the OS files     |"
+	@echo "| loader      | compile, link and assemble the Bootloader   |"
+	@echo "| upload      | upload image and bootloader to the board    |"
 	@echo "| debug       | use openocd to enter debug mode             |"
 	@echo "| clean       | remove the intermediate objects and image   |"
 	@echo "| format      | use clang format to make code tidy          |"
@@ -79,8 +81,12 @@ $(OUT)/$(TARGET): $(OUT) $(OBJS)
 $(OUT):
 	mkdir $@
 
-upload: os
-	openocd -f interface/stlink.cfg -f board/st_nucleo_f4.cfg -c " program $(OUT)/$(TARGET) exit reset"
+upload: os loader
+	openocd -f interface/stlink.cfg -f board/st_nucleo_f4.cfg -c " program $(OUT)/$(TARGET) exit"
+	openocd -f interface/stlink.cfg -f board/st_nucleo_f4.cfg -c " program $(BOOTLOADER) exit reset"
+
+loader:
+	make -C bootloader/
 
 debug:
 	openocd -f board/st_nucleo_f4.cfg
@@ -92,4 +98,4 @@ format:
 	clang-format -i $(C_SOURCE)
 
 clean:
-	rm -f $(OUT)/*.o build/$(TARGET)
+	$(RM) $(OUT)/*.o build/$(TARGET) bootloader/build/*
