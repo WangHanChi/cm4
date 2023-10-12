@@ -88,6 +88,7 @@ void command_lscpu()
     print_str("  Byte Order:\t\tLittle Endian\n");
     print_str("Vendor ID:\t\tSTMicroelectronics\n");
     print_str("  Model name:\t\tNUCLEO-F429ZI (Cortex-M4)\n");
+    print_str("\n");
 }
 
 void command_exit()
