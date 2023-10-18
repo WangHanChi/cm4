@@ -2,14 +2,22 @@
 #include "command.h"
 #include "string.h"
 #include "usart.h"
+#include "systick.h"
 
+/* define in command.c */
 extern uint8_t IsRoot;
+/* define in command.c */
+extern uint32_t HOUR, MIN, SEC;
+/* define in command.c */
+extern uint8_t IsIRQ;
 
 void shell_start()
 {
     char input[MAX_BUFFER_LENGTH];
     memset(input, 0, MAX_BUFFER_LENGTH);
-    IsRoot = 0;
+    IsRoot = IsIRQ = HOUR = MIN = SEC = 0;
+    /* enable the systick for reload value 8 MHz */
+    systick_init();
     // read input
     while (1) {
         // new line head
@@ -40,6 +48,12 @@ void parse(char str[])
         command_exit();
     else if (!strcmp(str, "clear"))
         command_clear();
+    else if (!strcmp(str, "date"))
+        command_date();
+    else if (!strcmp(str, "irq"))
+        command_irq();
+    else if (!strcmp(str, "dirq"))
+        command_dirq();
     else
         command_not_found(str);
 }

@@ -21,7 +21,8 @@ src/shell.c			\
 src/string.c		\
 src/math.c			\
 src/usart.c			\
-src/startup.c
+src/startup.c		\
+src/handler.c
 
 C_INCLUDES = -Iinc
 

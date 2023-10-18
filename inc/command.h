@@ -10,3 +10,6 @@ void command_sudo_su();
 void command_lscpu();
 void command_exit();
 void command_clear();
+void command_date();
+void command_irq();
+void command_dirq();

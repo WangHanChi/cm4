@@ -5,6 +5,10 @@
 
 /* use this to check is root or not */
 uint8_t IsRoot;
+/* use these to record time from boot */
+uint32_t HOUR, MIN, SEC;
+/* use this to switch IRQ enable or not */
+uint8_t IsIRQ;
 
 void input_buffer_overflow_message(char str[])
 {
@@ -36,6 +40,12 @@ void command_help()
         "| exit        | change to the user                          |\n");
     print_str(
         "| lscpu       | show the information for the board          |\n");
+    print_str(
+        "| date        | show the information for the time           |\n");
+    print_str(
+        "| irq         | enable the interrupt                        |\n");
+    print_str(
+        "| dirq        | disable the interrupt                       |\n");
     print_str(
         "+-----------------------------------------------------------+\n");
     print_str("\n");
@@ -104,4 +114,29 @@ void command_exit()
 void command_clear()
 {
     print_str("\33[2J\n");
+}
+
+void command_date()
+{
+    char time[3];
+    print_str("The time from booting passed ( ");
+    itoa(HOUR, time, 2);
+    print_str(time);
+    print_str(" hr | ");
+    itoa(MIN, time, 2);
+    print_str(time);
+    print_str(" min | ");
+    itoa(SEC, time, 2);
+    print_str(time);
+    print_str(" sec )\nTime Flies!\n");
+}
+
+void command_irq()
+{
+    IsIRQ = 1;
+}
+
+void command_dirq()
+{
+    IsIRQ = 0;
 }

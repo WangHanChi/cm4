@@ -27,3 +27,4 @@ void print_char(char c);
 void print_str(const char *str);
 int scan_str(char *str);
 void usart_init(void);
+void usart_reset(void);

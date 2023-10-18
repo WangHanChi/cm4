@@ -29,8 +29,9 @@ void go2APP(void)
         JumpAddress = *(uint32_t *) (FLASH_APP_ADDR + 4);
         Jump_to_Application = (pFunction) JumpAddress;
         /* initialize application's stack pointer */
-        (*SCB_VTOR) = (uint32_t) FLASH_APP_ADDR;
+        *(SCB_VTOR) = (uint32_t) FLASH_APP_ADDR;
         __set_MSP(*(uint32_t *) FLASH_APP_ADDR);
+        usart_reset();
         Jump_to_Application();
     } else{
         /* there si no application installed */

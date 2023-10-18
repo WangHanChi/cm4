@@ -84,3 +84,9 @@ void usart_init(void)
     *(USART3_CR1) |= (0x01 << 13);
     *(USART3_BRR) = DEFAULT_F_CLK / BAUDRATE;
 }
+
+void usart_reset(void)
+{
+    *(RCC_APB1RSTR) |= 1 << 18;
+    *(RCC_APB1RSTR) &= ~(1 << 18);
+}
