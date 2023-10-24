@@ -70,40 +70,6 @@
 #define USART3_CR3      ((__REG) (USART3 + 0x14))
 #define USART3_GTPR     ((__REG) (USART3 + 0x18))
 
-/* ADC Memory Map */
-#define ADC             ((__REG_TYPE) 0x40012000)
-#define ADC1_SR         ((__REG) (ADC + 0x00))
-#define ADC1_CR1        ((__REG) (ADC + 0x04))
-#define ADC1_CR2        ((__REG) (ADC + 0x08))
-#define ADC1_SMPR1      ((__REG) (ADC + 0x0C))
-#define ADC1_SMPR2      ((__REG) (ADC + 0x10))
-#define ADC1_JOFR1      ((__REG) (ADC + 0x14))
-#define ADC1_JOFR2      ((__REG) (ADC + 0x18))
-#define ADC1_JOFR3      ((__REG) (ADC + 0x1C))
-#define ADC1_JOFR4      ((__REG) (ADC + 0x20))
-#define ADC1_HTR        ((__REG) (ADC + 0x24))
-#define ADC1_LTR        ((__REG) (ADC + 0x28))
-#define ADC1_SQR1       ((__REG) (ADC + 0x2C))
-#define ADC1_SQR2       ((__REG) (ADC + 0x30))
-#define ADC1_SQR3       ((__REG) (ADC + 0x34))
-#define ADC1_JSQR       ((__REG) (ADC + 0x38))
-#define ADC1_JDR1       ((__REG) (ADC + 0x3C))
-#define ADC1_JDR2       ((__REG) (ADC + 0x40))
-#define ADC1_JDR3       ((__REG) (ADC + 0x44))
-#define ADC1_JDR4       ((__REG) (ADC + 0x48))
-#define ADC1_DR         ((__REG) (ADC + 0x4C))
-
-#define ADC_CSR         ((__REG) (ADC + 0x00 + 0x300))
-#define ADC_CCR         ((__REG) (ADC + 0x04 + 0x300))
-#define ADC_CDER        ((__REG) (ADC + 0x08 + 0x300))
-
-/* DAC Memory Map */
-#define DAC            ((__REG_TYPE) 0x40007400)
-#define DAC_CR         ((__REG) (DAC + 0x00))
-#define DAC_DHR12R1    ((__REG) (DAC + 0x08))
-#define DAC_DOR1       ((__REG) (DAC + 0x2C))
-#define DAC_SR         ((__REG) (DAC + 0x34))
-
 /* System Control block */
 #define SCB             ((__REG_TYPE) 0xE000ED00)
 #define SCB_CPUID	    ((__REG) (SCB + 0x00))
@@ -118,18 +84,5 @@
 #define PWR		        ((__REG_TYPE) 0x40007000)
 #define PWR_CR	        ((__REG) (PWR + 0x00))
 #define PWR_CSR	        ((__REG) (PWR + 0x04))
-
-/* I2C1 Memory Map */
-#define I2C1		    ((__REG_TYPE) 0x40005400)
-#define I2C1_CR1	    ((__REG) (I2C1 + 0x00))
-#define I2C1_CR2	    ((__REG) (I2C1 + 0x04))
-#define I2C1_OAR1       ((__REG) (I2C1 + 0x08))
-#define I2C1_OAR2	    ((__REG) (I2C1 + 0x0C))
-#define I2C1_DR	        ((__REG) (I2C1 + 0x10))
-#define I2C1_SR1	    ((__REG) (I2C1 + 0x14))
-#define I2C1_SR2	    ((__REG) (I2C1 + 0x18))
-#define I2C1_CCR	    ((__REG) (I2C1 + 0x1C))
-#define I2C1_TRISE	    ((__REG) (I2C1 + 0x20))
-#define I2C1_FLTR	    ((__REG) (I2C1 + 0x24))
 
 #endif

@@ -16,7 +16,9 @@ OUT = build
 C_SOURCE = 			\
 src/loader.c		\
 src/usart.c			\
-src/startup.c
+src/startup.c		\
+src/string.c		\
+src/math.c
 
 C_INCLUDES = -Iinc
 
@@ -32,8 +34,8 @@ VPATH = src
 vpath %.c
 
 # toolchain options
-MCU = -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16
-CFLAGS = -fno-common -ffreestanding -O0 -gdwarf-2 -g3 \
+MCU = -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16
+CFLAGS = -fno-common -ffreestanding -O0 -gdwarf-2 -g3 $(MCU) \
 -Wall -Werror -mcpu=cortex-m4 -mthumb -nostartfiles $(C_INCLUDES)
 
 LDFLAGS = $(MCU) -specs=nano.specs -Wl,-T$(LDSCRIPT) -lc -lm -lnosys -nostartfiles

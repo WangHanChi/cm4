@@ -1,6 +1,8 @@
 #include <stdint.h>
+#include <stdarg.h>
 #include "usart.h"
 #include "reg.h"
+#include "string.h"
 
 void print_char(char c)
 {
@@ -20,6 +22,95 @@ void print_str(const char *str)
             print_char('\r');
         str++;
     }
+}
+
+/* display the integer to screen */
+void print_int(int c, int len, int base)
+{
+    char buf[30];
+    switch (base)
+    {
+    case 10:
+        itoa(c, buf, len);
+        break;
+    case 16:
+        itohex(c, sizeof(int), buf);
+        break;
+    default:
+        print_str("No support type in output integer\n");
+        break;
+    }
+
+    print_str(buf);
+}
+
+/* internal function for print */
+int isdigit ( int c )
+{
+    if ( c <= '9' && c >= '0' )
+        return 1;
+    else
+        return 0;
+}
+
+/* print something to screen in general format */
+void print(const char *format, ...)
+{
+    const char *temp = format;
+    int len;
+    int d;
+    int c;
+    char *s;
+
+    va_list arg;
+    va_start(arg, format);
+
+    do {
+        if(*temp == '%'){
+            temp++;
+            len = 0;
+
+            if(isdigit(*temp)){
+                len = *temp;
+                while(isdigit(*temp)){
+                    len *= 10;
+                    len += *temp;
+                    temp++;
+                }
+            }
+
+            /* format in different types */
+            switch (*temp)
+            {
+            case 'd':
+                d = va_arg(arg, int);
+                print_int(d, len, 10);
+                break;
+            case 's':
+                s = va_arg(arg, char *);
+                print_str(s);
+                break;
+            case 'c':
+                c = (unsigned char)va_arg(arg, int);
+                print_char(c);
+                break;
+            case 'x':
+                d = va_arg(arg, int);
+                print_int(d, len, 16);
+                break;
+            
+            default:
+                print_str("No support type in print\n");
+                break;
+            }
+        } else {
+            /* string */
+            print_char(*temp);
+        }
+        temp++;
+        
+    } while (*temp != '\0');
+    
 }
 
 /* scan the stdin for user keyin */

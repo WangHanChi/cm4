@@ -3,7 +3,7 @@
 #include "usart.h"
 
 #define LOCATE_FUNC __attribute__((section(".mysection")))
-#define FLASH_APP_ADDR 0x8008000
+#define FLASH_APP_ADDR 0x800C000
 typedef void (*pFunction)(void);
 
 static inline void __set_MSP(uint32_t topOfMainStack)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "reg.h"
+#include <stdarg.h>
 
 /* USART TXE Flag
  * This flag is cleared when data is written to USARTx_DR and
@@ -25,6 +26,8 @@ extern uint32_t BAUDRATE;
 
 void print_char(char c);
 void print_str(const char *str);
+void print_int(int c, int len, int base);
+void print(const char *format, ...);
 int scan_str(char *str);
 void usart_init(void);
 void usart_reset(void);

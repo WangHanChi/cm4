@@ -6,7 +6,7 @@ MEMORY
 {
   CCMRAM		(xrw)	: ORIGIN = 0x10000000,	LENGTH = 64K
   RAM    		(xrw)	: ORIGIN = 0x20000000,	LENGTH = 192K
-  FLASH    		(rx)	: ORIGIN = 0x8008000,	LENGTH = 1968K
+  FLASH    		(rx)	: ORIGIN = 0x800C000,	LENGTH = 1952K
   MY_MEMORY		(rx)	: ORIGIN = 0x81F4000,	LENGTH = 48K
 }
 
@@ -18,6 +18,7 @@ SECTIONS
 		*(.text)
 		*(.text.*)
 		*(.rodata)
+		*(.rodata.*)
 		_sromdev = .;
 		_eromdev = .;
 		_sidata = .;
