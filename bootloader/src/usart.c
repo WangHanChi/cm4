@@ -44,6 +44,15 @@ void print_int(int c, int len, int base)
     print_str(buf);
 }
 
+/* display the float to screen */
+void print_float(float f, int len)
+{
+    char buf[30];
+    ftoa(f, buf, 3);
+    print_str(buf);
+    print_char('\r');
+}
+
 /* internal function for print */
 int isdigit ( int c )
 {
@@ -61,6 +70,7 @@ void print(const char *format, ...)
     int d;
     int c;
     char *s;
+    float f;
 
     va_list arg;
     va_start(arg, format);
@@ -98,7 +108,10 @@ void print(const char *format, ...)
                 d = va_arg(arg, int);
                 print_int(d, len, 16);
                 break;
-            
+            case 'f':
+                f = va_arg(arg, double);
+                print_float(f, len);
+                break;
             default:
                 print_str("No support type in print\n");
                 break;
@@ -106,6 +119,8 @@ void print(const char *format, ...)
         } else {
             /* string */
             print_char(*temp);
+            if(*temp == '\n')
+                print_char('\r');
         }
         temp++;
         

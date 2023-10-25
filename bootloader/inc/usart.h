@@ -27,6 +27,7 @@ extern uint32_t BAUDRATE;
 void print_char(char c);
 void print_str(const char *str);
 void print_int(int c, int len, int base);
+void print_float(float f, int len);
 void print(const char *format, ...);
 int scan_str(char *str);
 void usart_init(void);
