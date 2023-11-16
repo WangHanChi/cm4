@@ -1,20 +1,59 @@
-# About this
+# cm4  
 
-These are simple practices about ARM-Cortex M4 processor.  
-Most of them are learned on udemy and do some change.
+The shell interface with ARM Cortex-M4 processor  
+- Device: [NUCLEO-F429ZI](https://www.st.com/en/evaluation-tools/nucleo-f429zi.html)  
 
-## usart2tty
-This project is to build the bridge between MCU and users.  
-We can type in the console in STM32CubeIDE and send the message to
-MCU by USART.
+## Dependence
 
-## hello-bare-metal  
-This project is to do the same thing with usart2tty but using bare metal  
-We can use `putty` to communicate with serial port.  
-I also implement the `putty.py` which is the same function with `putty`.  
-Here is the [learning note](https://hackmd.io/@wanghanchi/cm4-cm4hbm)  
+- ARM Cross Compiler
+```
+$ sudo apt-get install gcc-arm-none-eabi
+```
+- lsb-core
+```
+$ sudo apt-get install lsb-core
+```
+- OpenOCD
+```
+$ git clone git://git.code.sf.net/p/openocd/code openocd
+$ sudo apt-get install build-essential pkg-config autoconf automake libtool libusb-dev libusb-1.0-0-dev libhidapi-dev
+$ sudo apt-get install libtool libsysfs-dev
+$ cd openocd && ./bootstrap
+$ ./configure
+$ make
+$ sudo make install
+$ openocd -v
+```
+- Screen
+```
+$ sudo apt-get install screen
+```
+- ST-link
+```
+$ sudo apt-get install git cmake libusb-1.0-0-dev
+$ git clone https://github.com/stlink-org/stlink && cd stlink
+$ cmake .
+$ make
+$ cd bin && sudo cp st-* /usr/local/bin
+$ cd ../lib && sudo cp *.so* /lib32
+$ cd ../config/udev/rules.d/ && sudo cp 49-stlinkv* /etc/udev/rules.d/
+```
 
-## context-switch
-This project is to do context switch and using usart to send which task is  
-working. Here is the [learning note](https://hackmd.io/QHc9-LluQEqTrlHtnm2P1Q)  
+## Build
 
+- Compile
+```
+$ make os
+```
+- Upload to board
+```
+$ make upload
+```
+- Connect with screen
+```
+$ make screen
+```
+- Help
+```
+$ make help
+```
