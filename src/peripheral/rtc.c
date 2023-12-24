@@ -78,7 +78,7 @@ int rtc_gettime(RTCTIME *rtc)
     /* get year */
     rtc->year = ((RTC->DR >> 20) * 10) + ((RTC->DR >> 16) & 0xf);
     /* get month */
-    rtc->year = ((RTC->DR >> 12) & 1) * 10 + ((RTC->DR >> 8) & 0xf);
+    rtc->month = ((RTC->DR >> 12) & 1) * 10 + ((RTC->DR >> 8) & 0xf);
     /* get day */
     rtc->mday = ((RTC->DR >> 4) & 3) + (RTC->DR & 0xf);
 
