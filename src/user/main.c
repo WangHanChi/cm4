@@ -123,9 +123,7 @@ void command_hello(char message[])
 
 void command_not_found(char message[])
 {
-    char ret[] =
-        "Error: command "
-        " not found, try <help>\n\r";
+    char ret[] = "Error: command not found, try <help>\n\r";
     int len = MESSAGE_LEN > strlen(ret) ? strlen(ret) : MESSAGE_LEN;
 
     strncpy(message, ret, len);
@@ -216,11 +214,12 @@ int get_cmd_index(const char *cmd)
 
 void select_cmd(char *input, char message[])
 {
+    memset(message, 0, MESSAGE_LEN);
     int cmd_index = get_cmd_index(input);
 
-    if (cmd_index != -1) {
-        func_table[cmd_index](message);
-    } else {
-        strncpy(message, "command error\n\r", MAX_BUFFER_LENGTH);
+    if (cmd_index == -1) {
+        cmd_index = 0;
     }
+
+    func_table[cmd_index](message);
 }
