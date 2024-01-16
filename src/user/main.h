@@ -8,6 +8,8 @@
 #include "usart.h"
 #include "xprintf.h"
 
+#define MAX_VOLT (33)
+
 // clang-format off
 const char banner[] = " \e[36;01m ===============================================================\e[0m\n"
                       "\r\e[33;01m  ###   #   #     #           ###   #   #  #####  #      #\n"

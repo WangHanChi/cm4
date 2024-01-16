@@ -18,6 +18,7 @@ char input[MAX_BUFFER_LENGTH] = {0};
 float pulse_A = 0;
 float pre_pulse_A = 0;
 float speed_A = 0;
+uint8_t display_speed = 0;
 
 static void vShellTask(void *pvParameters)
 {
@@ -170,8 +171,37 @@ void command_date(char message[])
     sprintf(message, "%d-%d-%d | %d-%d-%d\n\r", t.year, t.month, t.mday, t.hour,
             t.min, t.sec);
 }
+
 void command_pmdc(char message[])
 {
+    long target_volt = 0;
+    while (1) {
+        xprintf("Please enter the Volt you want ? (0.1 V/Unit)\n\r> ");
+        memset(input, 0, MAX_BUFFER_LENGTH);
+        xgets(input, MAX_BUFFER_LENGTH);
+        char *tmp = input;
+        int ret = xatoi(&tmp, &target_volt); /* 0:Failed, 1:Successful */
+
+        if ((ret != 1) || (target_volt > MAX_VOLT) || (target_volt < 0)) {
+            xprintf("Invaliad input, volt should be in 0 ~ %d\n\r", MAX_VOLT);
+        } else
+            break;
+    }
+
+    do {
+        xprintf("Do you want to display the speed per ticks ? (Y/N)\n\r> ");
+        memset(input, 0, MAX_BUFFER_LENGTH);
+        xgets(input, MAX_BUFFER_LENGTH);
+        if (!strncmp(input, "y", 1))
+            display_speed = 1;
+    } while (0);
+
+    xprintf("Set the output voltage to be < %u / %d >\n\r", target_volt,
+            MAX_VOLT);
+    xprintf(
+        "If want to stop control motor, reset the target_volt, enter < quit "
+        ">\n\r");
+
     /* Enable GPIO D port */
     (RCC->AHB1ENR) |= (1 << 3);
     /* Set intput for PD3 */
@@ -191,25 +221,29 @@ void command_pmdc(char message[])
     (GPIOB->BSRR) |= (1 << 7);
 
     exti_config();
-    Tim2_Config();
+    Tim2_config();
     DAC_config();
     Tim2_Start();
-    uint32_t value = 2048;
+    uint32_t value = (4096 * target_volt) / MAX_VOLT;
+    DAC_SetValue((uint32_t) value);
 
     while (1) {
+        // control algorithm begin
+
+        // control algorithm end
         memset(input, 0, MAX_BUFFER_LENGTH);
-        xgets(input, MAX_BUFFER_LENGTH);
-        if (!strncmp(input, "quit", 4))
-            break;
-
-        DAC_SetValue(value);
+        while (xgets(input, MAX_BUFFER_LENGTH)) {
+            if (!strncmp(input, "quit", 4)) {
+                // deinit DAC GPIOB GPIOD
+                DAC_Reset();
+                RCC->APB1ENR &= ~(RCC_APB1ENR_TIM2EN);
+                RCC->AHB1ENR &= ~(1 << 3);
+                RCC->APB1ENR &= ~(1 << 29);
+                xprintf("Stop to control motor ...\n\r");
+                return;
+            }
+        }
     }
-    DAC_Reset();
-    RCC->APB1ENR &= ~(RCC_APB1ENR_TIM2EN);
-    RCC->AHB1ENR &= ~(1 << 3);
-    RCC->APB1ENR &= ~(1 << 29);
-
-    xprintf("Stop to control motor ...\n\r");
 }
 
 /*
