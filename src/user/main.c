@@ -57,7 +57,6 @@ static void vWrtieTask(void *params)
     }
 }
 
-
 int main(void)
 {
     /* initial peripheral */
@@ -105,6 +104,7 @@ void command_help(char message[])
     "| reboot      | restart the board thought SCB_AIRCR         |\n\r"
     "| lscpu       | show the information for the board          |\n\r"
     "| date        | show the information for the time           |\n\r"
+    "| pmdc        | start to control PMDC                       |\n\r"
     "+-----------------------------------------------------------+\n\r"
     "\n\r";
     // clang-format on
@@ -169,6 +169,18 @@ void command_date(char message[])
             t.min, t.sec);
 }
 
+void command_pmdc(char message[])
+{
+    // WIP
+    while (1) {
+        memset(input, 0, MAX_BUFFER_LENGTH);
+        xgets(input, MAX_BUFFER_LENGTH);
+        if (!strncmp(input, "quit", 4))
+            break;
+    }
+    xprintf("Stop to control motor ...\n\r");
+}
+
 /*
  * commands list
  * (command, code)
@@ -180,7 +192,8 @@ void command_date(char message[])
     _(REBOOT, reboot)       \
     _(LSCPU, lscpu)         \
     _(CLEAR, clear)         \
-    _(DATE, date)
+    _(DATE, date)           \
+    _(PMDC, pmdc)
 
 typedef enum {
 #define _(CMD, cmd) CMD_##CMD,
