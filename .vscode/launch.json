@@ -5,11 +5,11 @@
         {
             "name": "Debug (openocd)",
             "cwd": "${workspaceRoot}",
-            "executable": "/home/hanchi/mini-os/10-Priority/build/os",
+            "executable": "build/kernel/main",
             "request": "launch",
             "type": "cortex-debug",
             "targetId": "STM32F429ZI",
-            "svdFile": "/home/hanchi/cm4/stm32f429.svd",
+            "svdFile": "stm32f429.svd",
             "servertype": "openocd",
             "armToolchainPath": "/usr/bin/",
             "configFiles": [

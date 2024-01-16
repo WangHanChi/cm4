@@ -155,7 +155,7 @@ typedef struct {
 
 #define GPIO_DeInit(pGPIOHandle)                               \
     do {                                                       \
-        RCC->AHB1ENR &= ~(1 << pGPIOHandle->GPIO_PINCFG.port); \
+        RCC->AHB1ENR &= ~(1 << ((pGPIOHandle)->GPIO_PINCFG.port)); \
     } while (0)
 
 #define GPIO_ReadPin(pGPIOx, PinNumber) (((pGPIOx)->IDR) & (1 << (PinNumber)))

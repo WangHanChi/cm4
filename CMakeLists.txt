@@ -58,6 +58,8 @@ set(PERIPHERAL_FILE
     ${PERIPHERAL}/usart.c
     ${PERIPHERAL}/timer.c
     ${PERIPHERAL}/rtc.c
+    ${PERIPHERAL}/exti.c
+    ${PERIPHERAL}/dac.c
 )
 
 set(C_SOURCES

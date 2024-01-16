@@ -1,5 +1,7 @@
 #pragma once
 
+#include "dac.h"
+#include "exti.h"
 #include "gpio.h"
 #include "rtc.h"
 #include "timer.h"
@@ -31,3 +33,5 @@ TaskHandle_t xTaskHandleCmd = NULL;
 TaskHandle_t xTaskHandleWrite = NULL;
 
 BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+void exti_config();

@@ -15,7 +15,9 @@
 
 char message[MESSAGE_LEN] = {0};
 char input[MAX_BUFFER_LENGTH] = {0};
-
+float pulse_A = 0;
+float pre_pulse_A = 0;
+float speed_A = 0;
 
 static void vShellTask(void *pvParameters)
 {
@@ -168,16 +170,45 @@ void command_date(char message[])
     sprintf(message, "%d-%d-%d | %d-%d-%d\n\r", t.year, t.month, t.mday, t.hour,
             t.min, t.sec);
 }
-
 void command_pmdc(char message[])
 {
-    // WIP
+    /* Enable GPIO D port */
+    (RCC->AHB1ENR) |= (1 << 3);
+    /* Set intput for PD3 */
+    (GPIOD->MODER) &= ~(0b11 << 6);
+    /* Set intput for PD4 */
+    (GPIOD->MODER) &= ~(0b11 << 8);
+    /* set pull-up */
+    (GPIOD->PUPDR) |= (0b10 << 6);
+    /* set pull-up */
+    (GPIOD->PUPDR) |= (0b10 << 8);
+
+    /* Enable GPIO B port */
+    (RCC->AHB1ENR) |= (1 << 1);
+    /* Set General purpose output for PB7, PB14 */
+    (GPIOB->MODER) |= (1 << 14) | (1 << 28);
+    /* Light up PB7 */
+    (GPIOB->BSRR) |= (1 << 7);
+
+    exti_config();
+    Tim2_Config();
+    DAC_config();
+    Tim2_Start();
+    uint32_t value = 2048;
+
     while (1) {
         memset(input, 0, MAX_BUFFER_LENGTH);
         xgets(input, MAX_BUFFER_LENGTH);
         if (!strncmp(input, "quit", 4))
             break;
+
+        DAC_SetValue(value);
     }
+    DAC_Reset();
+    RCC->APB1ENR &= ~(RCC_APB1ENR_TIM2EN);
+    RCC->AHB1ENR &= ~(1 << 3);
+    RCC->APB1ENR &= ~(1 << 29);
+
     xprintf("Stop to control motor ...\n\r");
 }
 
