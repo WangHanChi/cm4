@@ -189,7 +189,7 @@ void command_pmdc(char message[])
     }
 
     do {
-        xprintf("Do you want to display the speed per ticks ? (Y/N)\n\r> ");
+        xprintf("Do you want to display the speed per ticks ? (y/n)\n\r> ");
         memset(input, 0, MAX_BUFFER_LENGTH);
         xgets(input, MAX_BUFFER_LENGTH);
         if (!strncmp(input, "y", 1))

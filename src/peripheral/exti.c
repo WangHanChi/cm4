@@ -28,7 +28,7 @@ void exti_config()
 void __attribute__((interrupt)) EXTI3_IRQHandler(void)
 {
     if ((EXTI->PR) & (EXTI_PR_PR3)) {
-        xprintf("In EXTI\n\r");
+        // xprintf("In EXTI\n\r");
         uint8_t status_A = GPIO_ReadPin(GPIOD, 3);
         uint8_t status_B = GPIO_ReadPin(GPIOD, 4);
 
