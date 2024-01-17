@@ -19,6 +19,7 @@ float pulse_A = 0;
 float pre_pulse_A = 0;
 float speed_A = 0;
 uint8_t display_speed = 0;
+extern int count;
 
 static void vShellTask(void *pvParameters)
 {
@@ -187,6 +188,7 @@ void command_pmdc(char message[])
         } else
             break;
     }
+    xprintf("!!! Remember Enter < Ctrl+A and H > to record !!! \n\r");
 
     do {
         xprintf("Do you want to display the speed per ticks ? (y/n)\n\r> ");
@@ -220,6 +222,9 @@ void command_pmdc(char message[])
     /* Light up PB7 */
     (GPIOB->BSRR) |= (1 << 7);
 
+    count = 0;
+
+    xprintf("--------------------------------------DataStart\n\r");
     exti_config();
     Tim2_config();
     DAC_config();
@@ -233,6 +238,7 @@ void command_pmdc(char message[])
         // control algorithm end
         memset(input, 0, MAX_BUFFER_LENGTH);
         while (xgets(input, MAX_BUFFER_LENGTH)) {
+
             if (!strncmp(input, "quit", 4)) {
                 // deinit DAC GPIOB GPIOD
                 DAC_Reset();

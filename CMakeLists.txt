@@ -114,12 +114,26 @@ add_custom_target(upload
 
 # custom target for screen
 add_custom_target(screen
+    # also can use "screen -L -Logfile temp.txt /dev/ttyACM0 115200" to save logfile
+    # or you can in the screen and type Ctrl+A and input "H" to record !
     COMMAND gnome-terminal -- bash -c "screen /dev/ttyACM0 115200"
 )
 
 # custom target for format
 add_custom_target(format
     COMMAND clang-format -i ${USER}/*.c ${USER}/*.h ${PERIPHERAL}/*.c bootloader/src/*.c
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
+
+# custom target for copy 
+add_custom_target(copy
+    COMMAND python3 script/data_process.py
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
+
+# custom target for plot 
+add_custom_target(plot
+    COMMAND python3 script/plot.py
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
