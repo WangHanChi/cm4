@@ -3,12 +3,6 @@
 
 #include "xprintf.h"
 
-extern float pulse_A;
-extern float pre_pulse_A;
-extern float speed_A;
-extern uint8_t display_speed;
-int count = 0;
-
 
 void Tim2_config()
 {
@@ -24,9 +18,6 @@ void Tim2_config()
     /* Enable Timer interrupt generation */
     TIM2->DIER |= (TIM_DIER_UIE);
 
-    NVIC_SetPriority(TIM2_IRQn, 0x81);
-    NVIC_EnableIRQ(TIM2_IRQn);
-
     /* clear Update interrupt flag */
     TIM2->SR &= ~(TIM_SR_UIF);
 
@@ -39,16 +30,9 @@ void Tim2_config()
 
 void Tim2_Start()
 {
+    NVIC_SetPriority(TIM2_IRQn, 5);
+    NVIC_EnableIRQ(TIM2_IRQn);
     /* Enable timer */
     TIM2->CR1 |= (TIM_CR1_CEN);
 }
 
-void __attribute__((interrupt)) TIM2_IRQHandler(void)
-{
-    speed_A = 60 * (pulse_A - pre_pulse_A) * (200.0) / 1000.0;
-    if (display_speed)
-        xprintf("%d ->%d \n\r", count++, (int) speed_A);
-    pre_pulse_A = pulse_A;
-    /* Clear UIF update interrupt flag */
-    TIM2->SR &= ~(TIM_SR_UIF);
-}

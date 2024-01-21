@@ -20,7 +20,7 @@ void exti_config()
     (EXTI->FTSR) |= (EXTI_FTSR_TR3);
 
     /* set priority for EXTI0_IRQ_NO */
-    NVIC_SetPriority(EXTI3_IRQn, 0x79);
+    NVIC_SetPriority(EXTI3_IRQn, 5);
     // set_irqs_pending_bit(EXTI0_IRQ_NO);
     NVIC_EnableIRQ(EXTI3_IRQn);
 }

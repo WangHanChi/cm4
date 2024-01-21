@@ -19,7 +19,8 @@ float pulse_A = 0;
 float pre_pulse_A = 0;
 float speed_A = 0;
 uint8_t display_speed = 0;
-extern int count;
+int count = 0;
+uint32_t DAC_Output_value = 0;
 
 static void vShellTask(void *pvParameters)
 {
@@ -61,6 +62,60 @@ static void vWrtieTask(void *params)
     }
 }
 
+void __attribute__((interrupt)) TIM2_IRQHandler(void)
+{
+    // get tick count
+    xLastWakeTime = xTaskGetTickCount();
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xTaskNotifyFromISR(xspeedHandle, 0, eNoAction, &xHigherPriorityTaskWoken);
+
+    /* Clear UIF update interrupt flag */
+    TIM2->SR &= ~(TIM_SR_UIF);
+}
+
+static void vspeedTask(void *params)
+{
+    char *ptransmit = NULL;
+    while (1) {
+        xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+        speed_A = 60 * (pulse_A - pre_pulse_A) * (200.0) / 1000.0;
+        if (display_speed){
+            xsprintf(message, "%d ->%d \n\r", count++, (int) speed_A);
+            ptransmit = message;
+            xQueueSend(uart_write_queue, &ptransmit, portMAX_DELAY);
+        }
+        pre_pulse_A = pulse_A;
+        xTaskNotify(xCtrlAlgoHandle, 0, eNoAction);
+    }
+}
+
+static void vCtrlAlgoTask(void *params)
+{
+    while (1) {
+        xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+        // control algorithm begin
+        DAC_Output_value = 2.4;
+
+        for(int i = 0; i < 330000; i++){
+            // as the complex calculation
+        }
+        // control algorithm end
+        xTaskNotify(xDACOutputHandle, 0, eNoAction);
+    }
+}
+
+static void vDACOutputTask(void *params)
+{
+    while (1) {
+        xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+        DAC_SetValue((uint32_t) DAC_Output_value);
+
+        // check task can be done in limited time
+        // TickType_t checktime = xTaskGetTickCount();
+        // xprintf("The total speed : %u\n\r", checktime - xLastWakeTime);
+    }
+}
+
 int main(void)
 {
     /* initial peripheral */
@@ -85,6 +140,12 @@ int main(void)
         xTaskCreate(vCmdTask, "TASK-Cmd", 500, NULL, 1, &xTaskHandleCmd);
 
         xTaskCreate(vWrtieTask, "TASK-Write", 500, NULL, 1, &xTaskHandleWrite);
+        
+        xTaskCreate(vspeedTask, "TASK-GetSpeed", 500, NULL, 1, &xspeedHandle);
+        
+        xTaskCreate(vCtrlAlgoTask, "TASK-CalculateSpeed", 500, NULL, 1, &xCtrlAlgoHandle);
+        
+        xTaskCreate(vDACOutputTask, "TASK-DACOutput", 500, NULL, 1, &xDACOutputHandle);
 
         // freeRTOS start
         vTaskStartScheduler();
@@ -229,16 +290,12 @@ void command_pmdc(char message[])
     Tim2_config();
     DAC_config();
     Tim2_Start();
-    uint32_t value = (4096 * target_volt) / MAX_VOLT;
-    DAC_SetValue((uint32_t) value);
-
+    uint32_t DAC_Output_value = (4096 * target_volt) / MAX_VOLT;
+    DAC_SetValue((uint32_t) DAC_Output_value);
+    
     while (1) {
-        // control algorithm begin
-
-        // control algorithm end
         memset(input, 0, MAX_BUFFER_LENGTH);
         while (xgets(input, MAX_BUFFER_LENGTH)) {
-
             if (!strncmp(input, "quit", 4)) {
                 // deinit DAC GPIOB GPIOD
                 DAC_Reset();

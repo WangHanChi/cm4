@@ -8,6 +8,8 @@
 #include "usart.h"
 #include "xprintf.h"
 
+#include "FreeRTOSConfig.h"
+
 #define MAX_VOLT (33)
 
 // clang-format off
@@ -33,7 +35,14 @@ QueueHandle_t uart_write_queue = NULL;
 TaskHandle_t xTaskHandleShell = NULL;
 TaskHandle_t xTaskHandleCmd = NULL;
 TaskHandle_t xTaskHandleWrite = NULL;
+TaskHandle_t xspeedHandle = NULL;
+TaskHandle_t xCtrlAlgoHandle = NULL;
+TaskHandle_t xDACOutputHandle = NULL;
 
+// check the time which control algo take
+TickType_t xLastWakeTime = 0;
+
+// for xTaskNotifyFromISR
 BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
 void exti_config();
