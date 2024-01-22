@@ -78,7 +78,7 @@ static void vspeedTask(void *params)
     char *ptransmit = NULL;
     while (1) {
         xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
-        speed_A = 60 * (pulse_A - pre_pulse_A) * (200.0) / 1000.0;
+        speed_A = 60 * (pulse_A - pre_pulse_A) * (20.0) / 1000.0 / (1.785);
         if (display_speed) {
             xsprintf(message, "%d ->%d \n\r", count++, (int) speed_A);
             ptransmit = message;
@@ -96,7 +96,7 @@ static void vCtrlAlgoTask(void *params)
 
 
         // control algorithm begin
-        DAC_Output_value = 2.4;
+        // DAC_Output_value = 2.4;
 
         for (volatile int i = 0; i < 330000; i++) {
             // as the complex calculation

@@ -94,7 +94,7 @@ set(KERNEL_LDSCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/${STARTUP}/link.ld)
 
 # compiler and linker options
 set(MCU_FLAGS "-mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16")
-set(CMAKE_C_FLAGS "${MCU_FLAGS} -fno-common -ffreestanding -O1 -gdwarf-2 -g3 -Wall -Werror -mcpu=cortex-m4 -mthumb -nostartfiles")
+set(CMAKE_C_FLAGS "${MCU_FLAGS} -fno-common -ffreestanding -O0 -gdwarf-2 -g3 -Wall -Werror -mcpu=cortex-m4 -mthumb -nostartfiles")
 set(CMAKE_ASM_FLAGS "${MCU_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${MCU_FLAGS} -specs=nano.specs -Wl,-lc,-lm,-lnosys -nostartfiles")
 
