@@ -35,4 +35,3 @@ void Tim2_Start()
     /* Enable timer */
     TIM2->CR1 |= (TIM_CR1_CEN);
 }
-

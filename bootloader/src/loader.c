@@ -86,7 +86,7 @@ void loading_frame()
     xprintf("\n\rWelcome : )\nProgress Bar [\e[36;01m");
     for (volatile int i = 0; i < 60; ++i) {
         xprintf("#");
-        DELAY(100);
+        DELAY(150);
     }
     xprintf("\e[0m]\n");
     DELAY(120);

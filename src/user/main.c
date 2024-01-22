@@ -79,7 +79,7 @@ static void vspeedTask(void *params)
     while (1) {
         xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
         speed_A = 60 * (pulse_A - pre_pulse_A) * (200.0) / 1000.0;
-        if (display_speed){
+        if (display_speed) {
             xsprintf(message, "%d ->%d \n\r", count++, (int) speed_A);
             ptransmit = message;
             xQueueSend(uart_write_queue, &ptransmit, portMAX_DELAY);
@@ -93,26 +93,50 @@ static void vCtrlAlgoTask(void *params)
 {
     while (1) {
         xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+
+
         // control algorithm begin
         DAC_Output_value = 2.4;
 
-        for(volatile int i = 0; i < 330000; i++){
+        for (volatile int i = 0; i < 330000; i++) {
             // as the complex calculation
         }
         // control algorithm end
+
+
         xTaskNotify(xDACOutputHandle, 0, eNoAction);
     }
 }
 
 static void vDACOutputTask(void *params)
 {
+    char *ptransmit = NULL;
     while (1) {
         xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
         DAC_SetValue((uint32_t) DAC_Output_value);
 
         /* check task can be done in limited time */
         TickType_t checktime = xTaskGetTickCount();
-        xprintf("The total speed : %u\n\r", checktime - xLastWakeTime);
+
+        /* Uncommon this line to assert the total task time */
+        // configASSERT(((checktime - xLastWakeTime) < CTRL_PERIOD_MS));
+
+        /* Uncommon this line to watch get the total time */
+        // xprintf("The total speed : %u\n\r", checktime - xLastWakeTime);
+
+        /* The current method : To Warn User */
+        do {
+            if (((checktime - xLastWakeTime) < CTRL_PERIOD_MS))
+                break;
+            else {
+                xsprintf(message,
+                         "\e[31;01mWarning :  The calculation takes too long: "
+                         "%u ticks\e[0m\n\r",
+                         (checktime - xLastWakeTime));
+                ptransmit = message;
+                xQueueSend(uart_write_queue, &ptransmit, portMAX_DELAY);
+            }
+        } while (0);
     }
 }
 
@@ -140,12 +164,14 @@ int main(void)
         xTaskCreate(vCmdTask, "TASK-Cmd", 500, NULL, 1, &xTaskHandleCmd);
 
         xTaskCreate(vWrtieTask, "TASK-Write", 500, NULL, 1, &xTaskHandleWrite);
-        
+
         xTaskCreate(vspeedTask, "TASK-GetSpeed", 500, NULL, 1, &xspeedHandle);
-        
-        xTaskCreate(vCtrlAlgoTask, "TASK-CalculateSpeed", 500, NULL, 1, &xCtrlAlgoHandle);
-        
-        xTaskCreate(vDACOutputTask, "TASK-DACOutput", 500, NULL, 1, &xDACOutputHandle);
+
+        xTaskCreate(vCtrlAlgoTask, "TASK-CalculateSpeed", 500, NULL, 1,
+                    &xCtrlAlgoHandle);
+
+        xTaskCreate(vDACOutputTask, "TASK-DACOutput", 500, NULL, 1,
+                    &xDACOutputHandle);
 
         // freeRTOS start
         vTaskStartScheduler();
@@ -173,7 +199,7 @@ void command_help(char message[])
     "+-----------------------------------------------------------+\n\r"
     "\n\r";
     // clang-format on
-    int len = MESSAGE_LEN > strlen(ret) ? strlen(ret) : MESSAGE_LEN;
+    int len = MESSAGE_LEN > sizeof(ret) ? sizeof(ret) : MESSAGE_LEN;
 
     strncpy(message, ret, len);
 }
@@ -181,7 +207,7 @@ void command_help(char message[])
 void command_hello(char message[])
 {
     char ret[] = "Hello world!\n\r";
-    int len = MESSAGE_LEN > strlen(ret) ? strlen(ret) : MESSAGE_LEN;
+    int len = MESSAGE_LEN > sizeof(ret) ? sizeof(ret) : MESSAGE_LEN;
 
     strncpy(message, ret, len);
 }
@@ -189,7 +215,7 @@ void command_hello(char message[])
 void command_not_found(char message[])
 {
     char ret[] = "Error: command not found, try <help>\n\r";
-    int len = MESSAGE_LEN > strlen(ret) ? strlen(ret) : MESSAGE_LEN;
+    int len = MESSAGE_LEN > sizeof(ret) ? sizeof(ret) : MESSAGE_LEN;
 
     strncpy(message, ret, len);
 }
@@ -211,7 +237,7 @@ void command_lscpu(char message[])
         "  Model name:\t\tNUCLEO-F429ZI (Cortex-M4)\n\r"
         "\n\r";
 
-    int len = MESSAGE_LEN > strlen(ret) ? strlen(ret) : MESSAGE_LEN;
+    int len = MESSAGE_LEN > sizeof(ret) ? sizeof(ret) : MESSAGE_LEN;
 
     strncpy(message, ret, len);
 }
@@ -220,7 +246,7 @@ void command_clear(char message[])
 {
     char ret[] = "\r\n\33[2J";
 
-    int len = MESSAGE_LEN > strlen(ret) ? strlen(ret) : MESSAGE_LEN;
+    int len = MESSAGE_LEN > sizeof(ret) ? sizeof(ret) : MESSAGE_LEN;
 
     strncpy(message, ret, len);
 }
@@ -255,7 +281,7 @@ void command_pmdc(char message[])
         xprintf("Do you want to display the speed per ticks ? (y/n)\n\r> ");
         memset(input, 0, MAX_BUFFER_LENGTH);
         xgets(input, MAX_BUFFER_LENGTH);
-        if (!strncmp(input, "y", 1))
+        if (!strncmp(input, "y", 1) && strlen(input) == 1)
             display_speed = 1;
     } while (0);
 
@@ -292,7 +318,7 @@ void command_pmdc(char message[])
     Tim2_Start();
     uint32_t DAC_Output_value = (4096 * target_volt) / MAX_VOLT;
     DAC_SetValue((uint32_t) DAC_Output_value);
-    
+
     while (1) {
         memset(input, 0, MAX_BUFFER_LENGTH);
         while (xgets(input, MAX_BUFFER_LENGTH)) {
