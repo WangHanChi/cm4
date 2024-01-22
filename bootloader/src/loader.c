@@ -84,7 +84,7 @@ int main(void)
 void loading_frame()
 {
     xprintf("\n\rWelcome : )\nProgress Bar [\e[36;01m");
-    for (int i = 0; i < 60; ++i) {
+    for (volatile int i = 0; i < 60; ++i) {
         xprintf("#");
         DELAY(100);
     }
@@ -94,7 +94,7 @@ void loading_frame()
 
 int check(uint32_t *address)
 {
-    for (int i = 0; i < 256; ++i) {
+    for (volatile int i = 0; i < 256; ++i) {
         if (*(address + i * 4) & 0xFFFFFFFF)
             return 1;
     }

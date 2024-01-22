@@ -10,7 +10,7 @@ extern uint32_t BAUDRATE;
 
 #define DELAY(x)                            \
     do {                                    \
-        for(int i = 0 ; i < 5000*x; i++)    \
+        for(volatile int i = 0 ; i < 5000*x; i++)    \
             ;                               \
     } while(0)
 

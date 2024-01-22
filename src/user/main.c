@@ -96,7 +96,7 @@ static void vCtrlAlgoTask(void *params)
         // control algorithm begin
         DAC_Output_value = 2.4;
 
-        for(int i = 0; i < 330000; i++){
+        for(volatile int i = 0; i < 330000; i++){
             // as the complex calculation
         }
         // control algorithm end
@@ -110,9 +110,9 @@ static void vDACOutputTask(void *params)
         xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
         DAC_SetValue((uint32_t) DAC_Output_value);
 
-        // check task can be done in limited time
-        // TickType_t checktime = xTaskGetTickCount();
-        // xprintf("The total speed : %u\n\r", checktime - xLastWakeTime);
+        /* check task can be done in limited time */
+        TickType_t checktime = xTaskGetTickCount();
+        xprintf("The total speed : %u\n\r", checktime - xLastWakeTime);
     }
 }
 
