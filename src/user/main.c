@@ -80,7 +80,7 @@ static void vspeedTask(void *params)
         xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
         speed_A = 60 * (pulse_A - pre_pulse_A) * (20.0) / 1000.0 / (1.785);
         if (display_speed) {
-            xsprintf(message, "%d ->%d \n\r", count++, (int) speed_A);
+            xsprintf(message, "|%d| -> |%d| RPM\n\r", count++, (int) speed_A);
             ptransmit = message;
             xQueueSend(uart_write_queue, &ptransmit, portMAX_DELAY);
         }
@@ -322,6 +322,7 @@ void command_pmdc(char message[])
     while (1) {
         memset(input, 0, MAX_BUFFER_LENGTH);
         while (xgets(input, MAX_BUFFER_LENGTH)) {
+            /* turn off pmdc control */
             if (!strncmp(input, "quit", 4)) {
                 // deinit DAC GPIOB GPIOD
                 DAC_Reset();
@@ -330,6 +331,18 @@ void command_pmdc(char message[])
                 RCC->APB1ENR &= ~(1 << 29);
                 xprintf("Stop to control motor ...\n\r");
                 return;
+            }
+
+            /* change the speed */
+            uint32_t new_speed = 0;
+            char *pInput = input;
+            if (xatoi(&pInput, (int32_t *) &new_speed)) {
+                if ((new_speed > MAX_VOLT) || (new_speed < 0))
+                    xprintf("Invaliad input, volt should be in 0 ~ %d\n\r",
+                            MAX_VOLT);
+                else {
+                    DAC_Output_value = new_speed;
+                }
             }
         }
     }
