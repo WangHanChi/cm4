@@ -1,4 +1,5 @@
 /* C runtime library */
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -20,7 +21,9 @@ float pre_pulse_A = 0;
 float speed_A = 0;
 uint8_t display_speed = 0;
 int count = 0;
-uint32_t DAC_Output_value = 0;
+static uint32_t DAC_Output_value = 0;
+static float target_speed = 0;
+static float integral = 0;
 
 static void vShellTask(void *pvParameters)
 {
@@ -91,53 +94,73 @@ static void vspeedTask(void *params)
 
 static void vCtrlAlgoTask(void *params)
 {
-    while (1) {
-        xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+    xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
 
+    // Control algorithm begin
+    // Calculate the error (difference between target and current speed)
+    float error = target_speed - speed_A;
 
-        // control algorithm begin
-        // DAC_Output_value = 2.4;
+    // Update the integral term (simple accumulation)
+    integral += error;
 
-        for (volatile int i = 0; i < 330000; i++) {
-            // as the complex calculation
-        }
-        // control algorithm end
+    float new_speed = KP * error + KI * integral + speed_A;
 
+    /*
+     *  Voltage to Speed table
+     * --------------------------------------
+     * DAC    ->  Driver   ->   Speed
+     * 3.4 V      8 V           1000 (RPM)
+     * 3.0 V      6 V           800  (RPM)
+     * 2.6 V      4 V           533  (RPM)
+     * 2.1 V      1.5 V         Cannot spin
+     * --------------------------------------
+     */
+    float driver_volt = (new_speed / 3200) * 24;
 
-        xTaskNotify(xDACOutputHandle, 0, eNoAction);
+    driver_volt = 0.225 * driver_volt + 1.7;
+
+    DAC_Output_value = ((driver_volt * 4096) * 33) / 10;
+
+    // Limit the output to a reasonable range
+    if (DAC_Output_value > 4096) {
+        DAC_Output_value = 4096;
+    } else if (DAC_Output_value < 2600) {
+        DAC_Output_value = 2600;
     }
+
+    // Control algorithm end
+    xTaskNotify(xDACOutputHandle, 0, eNoAction);
 }
 
 static void vDACOutputTask(void *params)
 {
     char *ptransmit = NULL;
-    while (1) {
-        xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
-        DAC_SetValue((uint32_t) DAC_Output_value);
 
-        /* check task can be done in limited time */
-        TickType_t checktime = xTaskGetTickCount();
+    xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+    DAC_SetValue((uint32_t) DAC_Output_value);
 
-        /* Uncommon this line to assert the total task time */
-        // configASSERT(((checktime - xLastWakeTime) < CTRL_PERIOD_MS));
+    /* check task can be done in limited time */
+    TickType_t checktime = xTaskGetTickCount();
 
-        /* Uncommon this line to watch get the total time */
-        // xprintf("The total speed : %u\n\r", checktime - xLastWakeTime);
+    /* Uncommon this line to assert the total task time */
+    // configASSERT(((checktime - xLastWakeTime) < CTRL_PERIOD_MS));
 
-        /* The current method : To Warn User */
-        do {
-            if (((checktime - xLastWakeTime) < CTRL_PERIOD_MS))
-                break;
-            else {
-                xsprintf(message,
-                         "\e[31;01mWarning :  The calculation takes too long: "
-                         "%u ticks\e[0m\n\r",
-                         (checktime - xLastWakeTime));
-                ptransmit = message;
-                xQueueSend(uart_write_queue, &ptransmit, portMAX_DELAY);
-            }
-        } while (0);
-    }
+    /* Uncommon this line to watch get the total time */
+    // xprintf("The total speed : %u\n\r", checktime - xLastWakeTime);
+
+    /* The current method : To Warn User */
+    do {
+        if (((checktime - xLastWakeTime) < CTRL_PERIOD_MS))
+            break;
+        else {
+            xsprintf(message,
+                     "\e[31;01mWarning :  The calculation takes too long: "
+                     "%u ticks\e[0m\n\r",
+                     (checktime - xLastWakeTime));
+            ptransmit = message;
+            xQueueSend(uart_write_queue, &ptransmit, portMAX_DELAY);
+        }
+    } while (0);
 }
 
 int main(void)
@@ -262,19 +285,22 @@ void command_date(char message[])
 
 void command_pmdc(char message[])
 {
-    long target_volt = 0;
     while (1) {
-        xprintf("Please enter the Volt you want ? (0.1 V/Unit)\n\r> ");
+        xprintf("Please enter the speed you want ? (0 ~ 1050 RPM)\n\r> ");
         memset(input, 0, MAX_BUFFER_LENGTH);
         xgets(input, MAX_BUFFER_LENGTH);
         char *tmp = input;
-        int ret = xatoi(&tmp, &target_volt); /* 0:Failed, 1:Successful */
+        int ret =
+            xatoi(&tmp, (long *) &target_speed); /* 0:Failed, 1:Successful */
 
-        if ((ret != 1) || (target_volt > MAX_VOLT) || (target_volt < 0)) {
-            xprintf("Invaliad input, volt should be in 0 ~ %d\n\r", MAX_VOLT);
+        if ((ret != 1) || (float) (target_speed > MAX_RPM) ||
+            (float) (target_speed < 0)) {
+            xprintf("Invaliad input, speed should be in 0 ~ %d\n\r", MAX_RPM);
         } else
             break;
     }
+
+
     xprintf("!!! Remember Enter < Ctrl+A and H > to record !!! \n\r");
 
     do {
@@ -285,10 +311,9 @@ void command_pmdc(char message[])
             display_speed = 1;
     } while (0);
 
-    xprintf("Set the output voltage to be < %u / %d >\n\r", target_volt,
-            MAX_VOLT);
+    xprintf("Set the speed to be %d\n\r", (uint32_t) target_speed);
     xprintf(
-        "If want to stop control motor, reset the target_volt, enter < quit "
+        "If want to stop control motor, reset the speed, enter < quit "
         ">\n\r");
 
     /* Enable GPIO D port */
@@ -316,6 +341,8 @@ void command_pmdc(char message[])
     Tim2_config();
     DAC_config();
     Tim2_Start();
+
+    float target_volt = (target_speed + 1200) / 666;
     uint32_t DAC_Output_value = (4096 * target_volt) / MAX_VOLT;
     DAC_SetValue((uint32_t) DAC_Output_value);
 
@@ -334,14 +361,15 @@ void command_pmdc(char message[])
             }
 
             /* change the speed */
-            uint32_t new_speed = 0;
             char *pInput = input;
-            if (xatoi(&pInput, (int32_t *) &new_speed)) {
-                if ((new_speed > MAX_VOLT) || (new_speed < 0))
-                    xprintf("Invaliad input, volt should be in 0 ~ %d\n\r",
-                            MAX_VOLT);
+            long change_speed = 0;
+            if (xatoi(&pInput, (long *) &change_speed)) {
+                if ((float) (change_speed > MAX_RPM) ||
+                    (float) (change_speed < 0))
+                    xprintf("Invaliad input, speed should be in 0 ~ %d\n\r",
+                            MAX_RPM);
                 else {
-                    DAC_Output_value = new_speed;
+                    target_speed = change_speed;
                 }
             }
         }

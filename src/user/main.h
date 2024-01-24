@@ -3,6 +3,7 @@
 #include "dac.h"
 #include "exti.h"
 #include "gpio.h"
+#include "pi.h"
 #include "rtc.h"
 #include "timer.h"
 #include "usart.h"
@@ -11,6 +12,7 @@
 #include "FreeRTOSConfig.h"
 
 #define MAX_VOLT (33)
+#define MAX_RPM (1050)
 
 // clang-format off
 const char banner[] = " \e[36;01m ===============================================================\e[0m\n"
