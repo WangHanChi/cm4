@@ -21,7 +21,7 @@ void DAC_SetValue(uint32_t value)
 {
     if (value >= 4095)
         value = 4095;
-    DAC->DHR12R1 |= (value);
+    DAC->DHR12R1 = (value);
 }
 
 void DAC_Reset()
