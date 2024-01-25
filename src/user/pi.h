@@ -1,5 +1,5 @@
 #pragma once
 
 // PI controller parameters
-#define KP 3.0  // Proportional gain
-#define KI 0.8  // Integral gain
+#define KP (4.4635)  // Proportional gain
+#define KI (2.72)  // Integral gain

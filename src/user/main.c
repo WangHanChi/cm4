@@ -100,7 +100,6 @@ static void vCtrlAlgoTask(void *params)
         // Control algorithm begin
         // Calculate the error (difference between target and current speed)
         float error = target_speed - speed_A;
-        xprintf("err:%d\n\r", (int)error);
         // Update the integral term (simple accumulation)
         integral += error;
         
@@ -108,7 +107,7 @@ static void vCtrlAlgoTask(void *params)
         //     integral /= 2;
         // }
 
-        float new_speed = KP * error + KI * integral + speed_A;
+        float new_speed = KP * error + ((KI * integral) / CTRL_TICK_PER_SECOND)/* + speed_A*/ ;
 
         if(new_speed > 1000)
             new_speed = 1000;
@@ -132,8 +131,8 @@ static void vCtrlAlgoTask(void *params)
         // // Limit the output to a reasonable range
         if (DAC_Output_value > 4096) {
             DAC_Output_value = 4096;
-        } else if (DAC_Output_value < 2600) {
-            DAC_Output_value = 2600;
+        } else if (DAC_Output_value < 1000) {
+            DAC_Output_value = 1000;
         }
 
         // Control algorithm end
