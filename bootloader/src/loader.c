@@ -9,10 +9,9 @@
 #define FLASH_APP_ADDR 0x800C000
 typedef void (*pFunction)(void);
 
-static inline void set_MSP(uint32_t topOfMainStack)
-{
-    asm volatile("MSR msp, %0\n" : : "r"(topOfMainStack));
-}
+static inline void set_MSP(uint32_t topOfMainStack);
+static inline void NVIC_ClearEnableIRQs(void);
+static inline void NVIC_ClearAllPendingIRQs(void);
 
 void loading_frame();
 int check(uint32_t *address);
@@ -34,7 +33,9 @@ void go2APP(void)
         /* initialize application's stack pointer */
         SCB->VTOR = (uint32_t) FLASH_APP_ADDR;
         set_MSP(*(uint32_t *) FLASH_APP_ADDR);
-        // usart_reset();
+        usart3_reset();
+        NVIC_ClearEnableIRQs();
+        NVIC_ClearAllPendingIRQs();
         Jump_to_Application();
     } else {
         /* there si no application installed */
@@ -110,4 +111,33 @@ int check(uint32_t *address)
             return 1;
     }
     return 0;
+}
+
+static inline void set_MSP(uint32_t topOfMainStack)
+{
+    asm volatile("MSR msp, %0\n" : : "r"(topOfMainStack));
+}
+
+static inline void NVIC_ClearEnableIRQs(void)
+{
+    NVIC->ICER[0] = 0xFFFFFFFF;
+    NVIC->ICER[1] = 0xFFFFFFFF;
+    NVIC->ICER[2] = 0xFFFFFFFF;
+    NVIC->ICER[3] = 0xFFFFFFFF;
+    NVIC->ICER[4] = 0xFFFFFFFF;
+    NVIC->ICER[5] = 0xFFFFFFFF;
+    NVIC->ICER[6] = 0xFFFFFFFF;
+    NVIC->ICER[7] = 0xFFFFFFFF;
+}
+
+static inline void NVIC_ClearAllPendingIRQs(void)
+{
+    NVIC->ICPR[0] = 0xFFFFFFFF;
+    NVIC->ICPR[1] = 0xFFFFFFFF;
+    NVIC->ICPR[2] = 0xFFFFFFFF;
+    NVIC->ICPR[3] = 0xFFFFFFFF;
+    NVIC->ICPR[4] = 0xFFFFFFFF;
+    NVIC->ICPR[5] = 0xFFFFFFFF;
+    NVIC->ICPR[6] = 0xFFFFFFFF;
+    NVIC->ICPR[7] = 0xFFFFFFFF;
 }

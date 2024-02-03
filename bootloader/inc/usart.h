@@ -14,7 +14,8 @@ extern uint32_t BAUDRATE;
             ;                               \
     } while(0)
 
-void usart3_init (uint32_t bps);
-int usart3_test (void);
-void usart3_putc (uint8_t);
-uint8_t usart3_getc (void);
+void usart3_init(uint32_t bps);
+void usart3_reset(void);
+int usart3_test(void);
+void usart3_putc(uint8_t);
+uint8_t usart3_getc(void);

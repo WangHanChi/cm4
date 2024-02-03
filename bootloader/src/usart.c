@@ -110,3 +110,8 @@ void usart3_init(uint32_t bps)
 
     NVIC_EnableIRQ(USART3_IRQn);
 }
+
+void usart3_reset(void)
+{
+    RCC->APB1ENR &= ~(RCC_APB1ENR_USART3EN);
+}
