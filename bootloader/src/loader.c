@@ -1,10 +1,11 @@
 #include <stdint.h>
+#include <string.h>
 
 #include "stm32f4xx.h"
 #include "usart.h"
 #include "xprintf.h"
 
-#define LOCATE_FUNC __attribute__((section(".mysection")))
+#define PASSWORD_ADDR 0x800B000
 #define FLASH_APP_ADDR 0x800C000
 typedef void (*pFunction)(void);
 
@@ -49,7 +50,8 @@ int main(void)
     xdev_in(usart3_getc);
 
 
-    char start[2] = {0};
+    char start[80] = {0};
+    uint32_t password_len = 0;
     DELAY(3000);
     // clang-format off
     xprintf("\r\n");
@@ -68,15 +70,24 @@ int main(void)
     // clang-format on
 
     while (1) {
-        xprintf("Now jump to the os\n");
-        xprintf("Please enter \"ANY KEY + ENTER\" to start\n");
-
-        while ((start[0] == 0)) {
-            xgets(start, sizeof(start));
+        xprintf("Please enter \"PASSWORD + ENTER\" to start\n");
+        xgets(start, sizeof(start));
+        password_len = strlen(start);
+        unsigned char *pptr = (unsigned char *) PASSWORD_ADDR;
+        for (int i = 0; i < password_len; ++i) {
+            if ((*(pptr)++) == start[i])
+                continue;
+            else {
+                goto loginfail;
+            }
         }
 
         go2APP();
-        DELAY(10000);
+        xprintf("Now jump to the os\n");
+        DELAY(1000);
+
+    loginfail:
+        xprintf("You enter the wrong password!!\n\r");
     }
     return 0;
 }
@@ -95,7 +106,7 @@ void loading_frame()
 int check(uint32_t *address)
 {
     for (volatile int i = 0; i < 256; ++i) {
-        if (*(address + i * 4) & 0xFFFFFFFF)
+        if ((*(address + i * 4) & 0xFFFFFFFF) != 0xFFFFFFFF)
             return 1;
     }
     return 0;

@@ -14,6 +14,9 @@
 #include "main.h"
 #include "shell.h"
 
+/* for the bootloader to verify password */
+unsigned char __attribute__((section(".PASSWORD"))) buf_flash[10] = "deedbeef";
+
 char message[MESSAGE_LEN] = {0};
 char input[MAX_BUFFER_LENGTH] = {0};
 float pulse_A = 0;
@@ -102,16 +105,17 @@ static void vCtrlAlgoTask(void *params)
         float error = target_speed - speed_A;
         // Update the integral term (simple accumulation)
         integral += error;
-        
+
         // if(integral > 500){
         //     integral /= 2;
         // }
 
-        float new_speed = KP * error + ((KI * integral) / CTRL_TICK_PER_SECOND)/* + speed_A*/ ;
+        float new_speed = KP * error + ((KI * integral) /
+                                        CTRL_TICK_PER_SECOND) /* + speed_A*/;
 
-        if(new_speed > 1000)
+        if (new_speed > 1000)
             new_speed = 1000;
-        
+
         /*
          *  Voltage to Speed table
          * --------------------------------------
